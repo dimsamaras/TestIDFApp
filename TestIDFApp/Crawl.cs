@@ -56,9 +56,7 @@ public class Crawl: ICrawl
         var page = await context.NewPageAsync();
 
         await page.GotoAsync(uri);
-
-        await page.GetByRole(AriaRole.Button, new() { Name = "AGREE" }).ClickAsync();
-
+        
         await page.ScreenshotAsync(new PageScreenshotOptions
         {
             FullPage = true,

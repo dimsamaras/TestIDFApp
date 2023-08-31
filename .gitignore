@@ -373,3 +373,5 @@ FodyWeavers.xsd
 # exception to the rule
 /.editorconfig
 /.commit
+/.screenshot.png
+

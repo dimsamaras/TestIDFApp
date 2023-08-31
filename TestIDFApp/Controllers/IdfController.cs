@@ -1,7 +1,4 @@
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using TestIDFApp.Models;
 
 namespace TestIDFApp.Controllers;
@@ -36,9 +33,11 @@ public class IdfController : ControllerBase
 
         var response = await _crawl.PerformHttpRequest(url, HttpMethod.Get);
 
-        _logger.LogDebug(response.Content.ToString());
+        var res = await response.Content.ReadAsStringAsync();
         
-        return Ok(response.StatusCode);
+        _logger.LogDebug(res);
+        
+        return Ok(response.StatusCode + " : " + res);
 
     }
 }
