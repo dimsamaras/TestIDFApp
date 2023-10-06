@@ -1,7 +1,4 @@
-using System;
-using System.Net.Http;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using Microsoft.Playwright;
 
 namespace TestIDFApp;
@@ -13,6 +10,7 @@ public class Crawl: ICrawl
     public Crawl(IHttpClientFactory httpClientFactory) =>
         _httpClientFactory = httpClientFactory;
 
+    private List<string> _proxyList = new (){"4.184.84.223:80", "51.103.74.105:80"};
     public async Task<HttpResponseMessage> PerformHttpRequest(string uri, HttpMethod reqMethod)
     {
         
@@ -47,10 +45,12 @@ public class Crawl: ICrawl
     public async Task PerformPlaywrightScreenshotRequest(string uri)
     {
         using var playwright = await Playwright.CreateAsync();
-        await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+        await using var browser = await playwright.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
         {
             Headless = false,
+            Proxy = new Proxy{Server = SelectProxy()}
         });
+        
         var context = await browser.NewContextAsync();
 
         var page = await context.NewPageAsync();
@@ -66,5 +66,12 @@ public class Crawl: ICrawl
         await page.CloseAsync();
         await context.CloseAsync();
         await browser.CloseAsync();
+    }
+
+    private string SelectProxy()
+    {
+        var random = new Random();
+        var index = random.Next(_proxyList.Count);
+        return _proxyList[index];
     }
 }
