@@ -17,6 +17,7 @@ public class IdfController : ControllerBase
     }
 
     [HttpPost]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<ActionResult<string>> Screenshot([FromBody] IdfModel idfModel)
     {
         var url = idfModel.ResourceUrl;
@@ -27,6 +28,7 @@ public class IdfController : ControllerBase
     }
     
     [HttpPost]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<ActionResult<string>> Check([FromBody] IdfModel idfModel)
     {
         var url = idfModel.ResourceUrl;

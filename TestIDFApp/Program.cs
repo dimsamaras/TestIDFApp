@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using System.Net;
 using Microsoft.OpenApi.Models;
 using TestIDFApp;
 
@@ -23,7 +21,13 @@ builder.Services.AddSwaggerGen(
     });
 
 // Add services to the container.
-builder.Services.AddHttpClient();
+var managedProxy = new ManagedProxy();
+
+builder.Services.AddHttpClient<ICrawlHttpClient, CrawlHttpClient>().ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
+    Proxy = managedProxy
+});
 
 builder.Services.AddTransient<ICrawl, Crawl>();
 
