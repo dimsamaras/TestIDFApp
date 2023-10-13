@@ -2,7 +2,7 @@ using System.Net;
 
 namespace TestIDFApp;
 
-public class ManagedProxies: IWebProxy
+public class ManagedProxy: IWebProxy
 {
     private object proxyLock = new();
     private int _currentProxyIndex = 0;
@@ -10,7 +10,7 @@ public class ManagedProxies: IWebProxy
 
     public ICredentials Credentials { get; set; }
 
-    public ManagedProxies()
+    public ManagedProxy()
     {
         var proxyA = new Uri("http://4.184.84.223:80");
         var proxyB = new Uri("http://51.103.74.105:80");
@@ -33,8 +33,5 @@ public class ManagedProxies: IWebProxy
         // You can implement custom bypass logic here if needed.
         return false;
     }
-
-
-
-
+    
 }

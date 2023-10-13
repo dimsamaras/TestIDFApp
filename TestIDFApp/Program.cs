@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen(
     });
 
 // Add services to the container.
-var managedProxy = new ManagedProxies();
+var managedProxy = new ManagedProxy();
 
 builder.Services.AddHttpClient<ICrawlHttpClient, CrawlHttpClient>().ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
 {

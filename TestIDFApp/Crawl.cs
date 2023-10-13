@@ -4,15 +4,15 @@ namespace TestIDFApp;
 
 public class Crawl: ICrawl
 {
-    protected readonly ICrawlHttpClient ServiceHttpClient;
+    private readonly ICrawlHttpClient _serviceHttpClient;
 
     public Crawl(ICrawlHttpClient serviceHttpClient) =>
-        ServiceHttpClient = serviceHttpClient;
+        _serviceHttpClient = serviceHttpClient;
 
 
     public Task<HttpResponseMessage> PerformHttpRequest(string uri, HttpMethod reqMethod)
     {
-        return ServiceHttpClient.PerformHttpRequest(uri, reqMethod);
+        return _serviceHttpClient.PerformHttpRequest(uri, reqMethod);
     }
 
     public async Task PerformPlaywrightScreenshotRequest(string uri)
