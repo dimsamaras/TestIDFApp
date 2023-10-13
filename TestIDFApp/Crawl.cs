@@ -1,45 +1,18 @@
-using System.Net.Sockets;
 using Microsoft.Playwright;
 
 namespace TestIDFApp;
 
 public class Crawl: ICrawl
 {
-    private IHttpClientFactory _httpClientFactory;
+    protected readonly ICrawlHttpClient ServiceHttpClient;
 
-    public Crawl(IHttpClientFactory httpClientFactory) =>
-        _httpClientFactory = httpClientFactory;
+    public Crawl(ICrawlHttpClient serviceHttpClient) =>
+        ServiceHttpClient = serviceHttpClient;
 
-    private List<string> _proxyList = new (){"4.184.84.223:80", "51.103.74.105:80"};
-    public async Task<HttpResponseMessage> PerformHttpRequest(string uri, HttpMethod reqMethod)
+
+    public Task<HttpResponseMessage> PerformHttpRequest(string uri, HttpMethod reqMethod)
     {
-        
-        var httpClient = _httpClientFactory.CreateClient();
-        
-        try
-        {
-            var httpRequestMessage = new HttpRequestMessage(reqMethod, uri);
-            httpClient.DefaultRequestHeaders.Accept.ParseAdd("*/*");
-            httpClient.DefaultRequestHeaders.AcceptEncoding.ParseAdd("gzip, deflate, br");
-            httpClient.DefaultRequestHeaders.Connection.ParseAdd("keep-alive");
-            return await httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead);
-        }
-        catch (Exception ex) when (ex.InnerException != null &&
-                                   ex.InnerException.GetType() == typeof(TimeoutException))
-        {
-            throw new TimeoutException("Request timeout", ex);
-        }
-        catch (Exception ex) when (ex.InnerException != null &&
-                                   ex.InnerException.GetType() == typeof(SocketException) &&
-                                   ((SocketException) ex.InnerException).SocketErrorCode ==
-                                   SocketError.HostNotFound)
-        {
-            throw new Exception("Host not Found.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Request failed.", ex);
-        }
+        return ServiceHttpClient.PerformHttpRequest(uri, reqMethod);
     }
 
     public async Task PerformPlaywrightScreenshotRequest(string uri)
@@ -48,10 +21,14 @@ public class Crawl: ICrawl
         await using var browser = await playwright.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
         {
             Headless = false,
-            Proxy = new Proxy{Server = SelectProxy()}
+            Proxy = new Proxy { Server = "per-context" }
         });
-        
-        var context = await browser.NewContextAsync();
+
+        var context = await browser.NewContextAsync(new BrowserNewContextOptions
+                {
+                    Proxy = new Proxy {Server = Helper.SelectProxy()}
+                }
+            );
 
         var page = await context.NewPageAsync();
 
@@ -68,10 +45,4 @@ public class Crawl: ICrawl
         await browser.CloseAsync();
     }
 
-    private string SelectProxy()
-    {
-        var random = new Random();
-        var index = random.Next(_proxyList.Count);
-        return _proxyList[index];
-    }
 }

@@ -1,8 +1,6 @@
 namespace TestIDFApp;
 
-public interface ICrawl
+public interface ICrawlHttpClient
 {
     public Task<HttpResponseMessage> PerformHttpRequest(string uri, HttpMethod reqMethod);
-    
-    public Task PerformPlaywrightScreenshotRequest(string uri);    
 }
